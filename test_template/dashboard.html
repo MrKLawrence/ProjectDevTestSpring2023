@@ -1,0 +1,84 @@
+<!--1st, construct simple webpage structure-->
+<!DOCTYPE html>
+<html>
+    <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Lumber Futures Dashboard</title>
+            <!--2nd, load chart.js library from its CDN without the need to install it and host it on the server here:-->
+            <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
+        </head>
+<body>
+    <!--3rd, create a dropdown list here-->
+    <div>
+        <label for="column_select">Select Column:</label>
+        <select id="column_select">
+            <option value="Open">Open</option>
+            <option value="High">High</option>
+            <option value="Low">Low</option>
+            <option value="Close">Close</option>
+            <option value="AdjClose">AdjClose</option>
+            <option value="Volume">Volume</option>
+        </select>
+    </div>
+    <!--4th, create HTML5 canvas element to Chart.js to draw graphs here:-->
+    <div>
+    <canvas id="line_chart" width="900" height="400"></canvas>
+    </div>
+    <!--5th, create the script for Chart.js to populate the graph:-->
+    <script>
+        var ctx = document.getElementById('line_chart').getContext('2d');
+        console.log(labels);
+        console.log(values);
+        var line_chart = new Chart(ctx, {  //we pass the context object "ctx" here as the first parameter
+            type: 'line',  //this means the type of the charts to be loaded
+            labels: {{ labels  | tojson | safe }},
+                datasets: [
+                    {
+                        label: '',
+                        data: {{ values  | tojson | safe }},
+                        fill: false,
+                        borderColor: "rgb(75, 192, 192)",
+                        lineTension: 0.1
+                        //note that tooltip is a built-in feature in Chart.js
+                    }
+                ]
+            },
+            options: {
+                responsive: false 
+            }
+     });
+
+     var dropdown = document.getElementById('column_select');
+        dropdown.addEventListener('change', onClickDataChanged);
+
+        // function to update the chart
+        function onClickDataChanged() {
+            var column_name = dropdown.value;
+            var index = getColumnIndex(column_name);
+            chart.data.datasets[0].label = column_name;
+            chart.data.datasets[0].data = values.map(row => row[index]);
+            chart.update();
+        }
+
+        // function to get the index of the selected column
+        function getColumnIndex(column_name) {
+            switch (column_name) {
+                case "Open":
+                    return 1;
+                case "High":
+                    return 2;
+                case "Low":
+                    return 3;
+                case "Close":
+                    return 4;
+                case "AdjClose":
+                    return 5;
+                case "Volume":
+                    return 6;
+            }
+        }
+	</script>
+</body>
+</html>
